@@ -9,6 +9,7 @@ import org.snlab.flash.ModelManager.InverseModel;
 import org.snlab.flash.ModelManager.Ports.PersistentPorts;
 import org.snlab.network.Device;
 import org.snlab.network.Network;
+import org.snlab.network.Pairs;
 import org.snlab.network.Rule;
 
 public class I2Network {
@@ -84,13 +85,16 @@ public class I2Network {
 
     public static void main(String[] args) {
         System.out.println(getNetwork().getInitialRules().size());
+
         // System.exit(1);
         for (int i = 0; i < 1; i++) {
             Network n = getNetwork();
+            Pairs pairs = new Pairs("dataset/pairs.txt", n);
             InverseModel verifier = new InverseModel(n, new PersistentPorts());
             long s = System.nanoTime();
             ConflictFreeChanges cgs = verifier.insertMiniBatch(n.getInitialRules());
             verifier.update(cgs);
+            
             System.out.println(verifier.predSize() + " " + (System.nanoTime() - s));
         }
     }

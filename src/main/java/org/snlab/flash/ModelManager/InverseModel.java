@@ -269,6 +269,22 @@ public class InverseModel {
         return transferredECs;
     }
 
+    /* public void buildPaths(Pairs pairs) {
+        // For each destination
+        long[] destinations = pairs.getDestinations();
+        for (long destination : destinations) {
+            // Get all the sources and the path list for the destination
+            BigInteger destIp = BigInteger.valueOf(destination);
+            HashMap<Long, Device> sources = pairs.getSources(destination);
+            long predicateMatch = bddEngine.ref(destination);
+            for (long source : sources.keySet()) {
+                // Get the path
+                // Add the path to the portsToPredicate
+                portsToPredicate.put(new PersistentPorts(path, 0, path.size()), BDDEngine.BDDTrue);
+            }
+        }
+    } */
+
     public HashMap<Port, HashSet<Integer>> getPortToPredicate() {
         HashMap<Port, HashSet<Integer>> ret = new HashMap<>();
         for (Map.Entry<Ports, Integer> entry : portsToPredicate.entrySet())
