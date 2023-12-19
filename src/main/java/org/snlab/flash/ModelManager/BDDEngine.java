@@ -1,7 +1,8 @@
 package org.snlab.flash.ModelManager;
 
-import jdd.bdd.BDD;
 import java.math.BigInteger;
+
+import jdd.bdd.BDD;
 
 class TrieCode {
     int result;
@@ -65,6 +66,13 @@ public final class BDDEngine {
         }
         this.dst = new TrieCode(BDDTrue);
         this.src = new TrieCode(BDDTrue);
+    }
+
+    public void printVars() {
+        for (int i = 0; i < size; i++) {
+            System.out.println("var " + i + ": " + vars[i]);
+            System.out.println("nvar " + i + ": " + nVars[i]);
+        }
     }
 
     public int encodeIpv4(BigInteger ip, int prefix) {

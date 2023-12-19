@@ -1,10 +1,15 @@
 package org.snlab.flash.ModelManager;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import java.util.*;
-
-import org.snlab.flash.ModelManager.Ports.Ports;
 import org.snlab.flash.ModelManager.Ports.PersistentPorts;
+import org.snlab.flash.ModelManager.Ports.Ports;
 import org.snlab.network.Device;
 import org.snlab.network.Network;
 import org.snlab.network.Port;
@@ -44,7 +49,8 @@ public class InverseModel {
         this.ruleToBddMatch = new HashMap<>();
 
         // Relabel every device as the index used by Ports, starting from 0
-        for (Device device : network.getAllDevices()) this.deviceToRules.put(device, new IndexedRules());
+        for (Device device : network.getAllDevices())
+            this.deviceToRules.put(device, new IndexedRules());
 
         // Each device has a default rule with default action.
         ArrayList<Port> key = new ArrayList<>();
@@ -67,6 +73,7 @@ public class InverseModel {
 
     /**
      * Notates current data-plane (flow rules) as f, consider transition to f'
+     * 
      * @param insertions f' - f
      * @param deletions  f - f'
      * @return the change \chi
@@ -81,16 +88,21 @@ public class InverseModel {
                 continue;
             }
             inserted.add(rule);
-            ruleToBddMatch.put(rule, bddEngine.encodeIpv4(rule.getMatch(), rule.getPrefix(), rule.getSrc(), rule.getSrcSuffix()));
+            ruleToBddMatch.put(rule,
+                    bddEngine.encodeIpv4(rule.getMatch(), rule.getPrefix(), rule.getSrc(), rule.getSrcSuffix()));
             deviceToRules.get(rule.getDevice()).insert(rule, size);
         }
-        for (Rule rule : deleted) deviceToRules.get(rule.getDevice()).remove(rule, size);
+        for (Rule rule : deleted)
+            deviceToRules.get(rule.getDevice()).remove(rule, size);
 
         ConflictFreeChanges ret = new ConflictFreeChanges(bddEngine);
-        // Notice recomputing the #ECs can be faster than rule-deleting if many rules are deleted (especially when all rules are deleted).
+        // Notice recomputing the #ECs can be faster than rule-deleting if many rules
+        // are deleted (especially when all rules are deleted).
         // For the purpose of evaluation, we did not go through such short-cut.
-        for (Rule rule : deleted) identifyChangesDeletion(rule, ret);
-        for (Rule rule : inserted) identifyChangesInsert(rule, ret);
+        for (Rule rule : deleted)
+            identifyChangesDeletion(rule, ret);
+        for (Rule rule : inserted)
+            identifyChangesInsert(rule, ret);
         s1 += System.nanoTime();
         return ret;
     }
@@ -98,7 +110,8 @@ public class InverseModel {
     private int getHit(Rule rule) {
         int hit = bddEngine.ref(ruleToBddMatch.get(rule));
         for (Rule r : deviceToRules.get(rule.getDevice()).getAllOverlappingWith(rule, size)) {
-            if (!ruleToBddMatch.containsKey(r)) continue;
+            if (!ruleToBddMatch.containsKey(r))
+                continue;
 
             if (r.getPriority() > rule.getPriority()) {
                 int newHit = bddEngine.diff(hit, ruleToBddMatch.get(r));
@@ -106,7 +119,8 @@ public class InverseModel {
                 hit = newHit;
             }
 
-            if (hit == BDDEngine.BDDFalse) break;
+            if (hit == BDDEngine.BDDFalse)
+                break;
         }
         return hit;
     }
@@ -129,7 +143,8 @@ public class InverseModel {
     }
 
     private void identifyChangesDeletion(Rule rule, ConflictFreeChanges ret) {
-        if (ruleToBddMatch.get(rule) == null) return; // cannot find the rule to be removed
+        if (ruleToBddMatch.get(rule) == null)
+            return; // cannot find the rule to be removed
 
         IndexedRules targetNode = deviceToRules.get(rule.getDevice());
         ArrayList<Rule> sorted = targetNode.getAllOverlappingWith(rule, size);
@@ -162,7 +177,6 @@ public class InverseModel {
         bddEngine.deRef(hit);
     }
 
-
     private void insertPredicate(HashMap<Ports, Integer> newPortsToPreds, Ports newPorts, Integer predicate) {
         if (newPortsToPreds.containsKey(newPorts)) {
             int t = newPortsToPreds.get(newPorts);
@@ -186,14 +200,12 @@ public class InverseModel {
         conflictFreeChanges.aggrBDDs();
         s1to2 += System.nanoTime();
 
-
         s2 -= System.nanoTime();
         HashSet<Integer> transferredECs = new HashSet<>();
 
         for (Map.Entry<Integer, TreeMap<Integer, Port>> entryI : conflictFreeChanges.getAll().entrySet()) {
             int delta = entryI.getKey();
             bddEngine.ref(delta);
-
             HashMap<Ports, Integer> newPortsToPreds = new HashMap<>();
             for (Map.Entry<Ports, Integer> entry : portsToPredicate.entrySet()) {
                 Ports ports = entry.getKey();
@@ -215,7 +227,6 @@ public class InverseModel {
                     delta = t;
                 }
 
-
                 if (intersection != predicate) {
                     // EC is partially affected by change, which causes split
                     // transferredECs.add(intersection);
@@ -235,8 +246,26 @@ public class InverseModel {
         }
         s2 += System.nanoTime();
 
-        // Manually deref BDDs used by Changes since its deconstructor doesn't handle this.
+        // Manually deref BDDs used by Changes since its deconstructor doesn't handle
+        // this.
         conflictFreeChanges.releaseBDDs();
+        // Count total number of items in every array of the map
+        int counter = 0;
+        for (Map.Entry<Ports, Integer> entry : portsToPredicate.entrySet()) {
+            PersistentPorts curr = (PersistentPorts) entry.getKey();
+            Integer predicate = entry.getValue();
+            //bddEngine.getBdd().printSet(predicate);
+            /* LinkedList<Port> ports = curr.getAll();
+            for (Port p : ports) {
+                System.out.println(p.getDevice() + " " + p.getName());
+            } */
+            //System.out.println(bddEngine.getBdd());
+            System.out.println(curr.getAll().get(0));
+            counter++;
+            if (counter == 2) {
+                break;
+            }
+        }
         return transferredECs;
     }
 
@@ -256,7 +285,8 @@ public class InverseModel {
 
     public double printTime(int size) {
         long nsToUsPU = 1000L * size;
-        if (size == 0)  nsToUsPU = 1000L * 1000L;
+        if (size == 0)
+            nsToUsPU = 1000L * 1000L;
         System.out.println("    Stage 1 (Update Block Computation) " + (s1 / nsToUsPU) + " us per-update");
         System.out.println("    Converting to Conflict-free Update Block " + (s1to2 / nsToUsPU) + " us per-update");
         System.out.println("    Stage 2 (Model Update) " + (s2 / nsToUsPU) + " us per-update");

@@ -1,8 +1,13 @@
 #!/bin/python3
-import argparse, os
-from py.I2LongTail import I2LongTail
+import argparse
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 from py.I2CE2D import I2CE2D
 from py.I2EarlyDetection import I2EarlyDetection
+from py.I2LongTail import I2LongTail
 from py.LNet1AllPair import LNet1AllPair
 
 if __name__ == '__main__':

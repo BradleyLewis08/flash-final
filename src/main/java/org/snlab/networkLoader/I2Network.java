@@ -5,14 +5,15 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import org.snlab.flash.ModelManager.ConflictFreeChanges;
-import org.snlab.flash.ModelManager.Ports.PersistentPorts;
 import org.snlab.flash.ModelManager.InverseModel;
+import org.snlab.flash.ModelManager.Ports.PersistentPorts;
 import org.snlab.network.Device;
 import org.snlab.network.Network;
 import org.snlab.network.Rule;
 
 public class I2Network {
-    static public String[] devicenames = {"atla", "chic", "hous", "kans", "losa", "newy32aoa", "salt", "seat", "wash"};
+    static public String[] devicenames = { "atla", "chic", "hous", "kans", "losa", "newy32aoa", "salt", "seat",
+            "wash" };
 
     public static Network getNetwork() {
         Network n = getTopo();
@@ -20,6 +21,7 @@ public class I2Network {
         for (String name : devicenames) {
             Device device = n.getDevice(name);
             try {
+                // List all current directories in current directory
                 Scanner in = new Scanner(new File("dataset/I2/" + name + "apnotcomp"));
                 while (in.hasNextLine()) {
                     String line = in.nextLine();
@@ -39,7 +41,7 @@ public class I2Network {
         }
         return n;
     }
-    
+
     public static Network getTopo() {
         Network n = new Network("Internet2");
 
@@ -83,7 +85,7 @@ public class I2Network {
     public static void main(String[] args) {
         System.out.println(getNetwork().getInitialRules().size());
         // System.exit(1);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1; i++) {
             Network n = getNetwork();
             InverseModel verifier = new InverseModel(n, new PersistentPorts());
             long s = System.nanoTime();

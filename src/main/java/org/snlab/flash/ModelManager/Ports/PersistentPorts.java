@@ -1,6 +1,10 @@
 package org.snlab.flash.ModelManager.Ports;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.TreeMap;
 
 import org.snlab.network.Device;
 import org.snlab.network.Port;
@@ -28,8 +32,10 @@ public class PersistentPorts extends Ports {
 
         int h;
         h = this.p.hashCode();
-        if (this.l != null) h = 31 * h + this.l.hash;
-        if (this.r != null) h = 31 * h + this.r.hash;
+        if (this.l != null)
+            h = 31 * h + this.l.hash;
+        if (this.r != null)
+            h = 31 * h + this.r.hash;
         this.hash = h;
     }
 
@@ -43,12 +49,21 @@ public class PersistentPorts extends Ports {
     @Override
     public PersistentPorts create(ArrayList<Port> ports, int lPorts, int rPorts) {
         ports.sort(Comparator.comparingInt((Port p) -> p.getDevice().uid));
+        // print out all the port uids
+        /* for (Port p : ports) {
+            System.out.println(p.getDevice().uid);
+            ArrayList<Rule> rules = p.getDevice().getInitialRules();
+            for (Rule r : rules) {
+                System.out.println(r.getDevice() + " " + r.getMatch() + " " + r.getPrefix() + " " + r.getOutPort());
+            }
+        } */
         return new PersistentPorts(ports, lPorts, rPorts);
     }
 
     @Override
     public PersistentPorts createWithChanges(TreeMap<Integer, Port> ports) {
-        if (ports.size() == 0) return this;
+        if (ports.size() == 0)
+            return this;
         return new PersistentPorts(ports, this, 0, Device.cnt);
     }
 
@@ -70,15 +85,23 @@ public class PersistentPorts extends Ports {
 
         int h;
         h = this.p.hashCode();
-        if (this.l != null) h = 31 * h + this.l.hash;
-        if (this.r != null) h = 31 * h + this.r.hash;
+        if (this.l != null)
+            h = 31 * h + this.l.hash;
+        if (this.r != null)
+            h = 31 * h + this.r.hash;
         this.hash = h;
     }
 
     private void getAll(LinkedList<Port> ret) {
         ret.add(p);
-        if (this.l != null) this.l.getAll(ret);
-        if (this.r != null) this.r.getAll(ret);
+        if (this.l != null) {
+            this.l.getAll(ret);
+        }
+        ;
+        if (this.r != null) {
+            this.r.getAll(ret);
+        }
+        ;
     }
 
     @Override
@@ -95,7 +118,8 @@ public class PersistentPorts extends Ports {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o)
+            return true;
         if (o instanceof PersistentPorts && this.hash == ((PersistentPorts) o).hash) {
             return Objects.equals(this.l, ((PersistentPorts) o).l) && Objects.equals(this.r, ((PersistentPorts) o).r);
         }
