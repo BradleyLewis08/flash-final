@@ -67,7 +67,6 @@ public class TopologyParser {
 	}
 
 	public static Network createTopologyFromMininet(String mininetConfigFileName) {
-		mininetConfigFileName = "/Users/bradleylewis/flash/src/main/java/org/snlab/networkLoader/mininet.config";
 		try (BufferedReader reader = new BufferedReader(new FileReader(mininetConfigFileName))) {
 			String line;
 			int lineIndex = 0;
@@ -75,6 +74,7 @@ public class TopologyParser {
 			ArrayList<String> addedLinks = new ArrayList<String>();
 			while ((line = reader.readLine()) != null) {
 				line = line.trim();
+				System.out.println(line);
 				// First line of config file contains all devices
 				if (lineIndex == 0) {
 					String[] devices = line.split("\\s+");

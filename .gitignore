@@ -9,3 +9,4 @@ output/
 dataset/
 *.log
 backup/
+.DS_Store
