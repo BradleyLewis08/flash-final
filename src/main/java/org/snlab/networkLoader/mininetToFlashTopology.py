@@ -36,6 +36,8 @@ def parse_file(config_filename):
                             continue
                         device_port = link.split(":")[0]
                         other_device_port = link.split(":")[1]
+                        if (other_device_port not in ports_to_device):
+                            continue
                         other_device = ports_to_device[other_device_port]
                         topology_file.write(
                             device + " " + device_port + " " + other_device + " " + other_device_port + "\n")
