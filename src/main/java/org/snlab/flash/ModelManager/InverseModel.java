@@ -1,5 +1,6 @@
 package org.snlab.flash.ModelManager;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import org.snlab.flash.ModelManager.Ports.PersistentPorts;
 import org.snlab.flash.ModelManager.Ports.Ports;
 import org.snlab.network.Device;
 import org.snlab.network.Network;
+import org.snlab.network.Pairs;
 import org.snlab.network.Port;
 import org.snlab.network.Rule;
 
@@ -254,12 +256,14 @@ public class InverseModel {
         for (Map.Entry<Ports, Integer> entry : portsToPredicate.entrySet()) {
             PersistentPorts curr = (PersistentPorts) entry.getKey();
             Integer predicate = entry.getValue();
-            //bddEngine.getBdd().printSet(predicate);
-            /* LinkedList<Port> ports = curr.getAll();
-            for (Port p : ports) {
-                System.out.println(p.getDevice() + " " + p.getName());
-            } */
-            //System.out.println(bddEngine.getBdd());
+            // bddEngine.getBdd().printSet(predicate);
+            /*
+             * LinkedList<Port> ports = curr.getAll();
+             * for (Port p : ports) {
+             * System.out.println(p.getDevice() + " " + p.getName());
+             * }
+             */
+            // System.out.println(bddEngine.getBdd());
             System.out.println(curr.getAll().get(0));
             counter++;
             if (counter == 2) {
@@ -269,21 +273,52 @@ public class InverseModel {
         return transferredECs;
     }
 
-    /* public void buildPaths(Pairs pairs) {
+    public void buildPaths(Pairs pairs) {
         // For each destination
         long[] destinations = pairs.getDestinations();
         for (long destination : destinations) {
             // Get all the sources and the path list for the destination
             BigInteger destIp = BigInteger.valueOf(destination);
             HashMap<Long, Device> sources = pairs.getSources(destination);
-            long predicateMatch = bddEngine.ref(destination);
+            int predicateMatch = bddEngine.getBestSrcIpMatch(destIp);
+            Ports path = null;
+            // System.out.println("MATCH IS:" + predicateMatch);
+            bddEngine.getBdd().printSet(predicateMatch);
+            // Find predicateMatch inside portsToPredicate
+            for (Ports ports : portsToPredicate.keySet()) {
+                Integer predicate = portsToPredicate.get(ports);
+                if (bddEngine.checkIntersection(predicateMatch, predicate)) {
+                    // System.out.println("MATCHED: " + predicate + " with " + predicateMatch);
+                    predicateMatch = predicate;
+                    path = ports;
+                    break;
+                }
+            }
+
+            System.out.println("NORMAL PATH:");
+            System.out.println(path.getAll());
+            System.out.println("CONSTRUCTED PATH:");
+
             for (long source : sources.keySet()) {
-                // Get the path
-                // Add the path to the portsToPredicate
-                portsToPredicate.put(new PersistentPorts(path, 0, path.size()), BDDEngine.BDDTrue);
+                // Get the source device
+                Device sourceDevice = sources.get(source);
+                // Get the source IP
+                BigInteger srcIp = BigInteger.valueOf(source);
+
+                boolean isOn = false;
+                for (Port port : path.getAll()) {
+                    // Get the destination port
+                    if (port.getDevice() == sourceDevice) {
+                        isOn = true;
+                    }
+
+                    if (isOn) {
+                        System.out.println(port.getName() + " " + port.getDevice().getName());
+                    }
+                }
             }
         }
-    } */
+    }
 
     public HashMap<Port, HashSet<Integer>> getPortToPredicate() {
         HashMap<Port, HashSet<Integer>> ret = new HashMap<>();

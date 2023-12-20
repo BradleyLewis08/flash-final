@@ -27,8 +27,9 @@ class TrieCode {
         return this.right;
     }
 
-    public  TrieCode buildSkip() {
-        if (this.skip == null) this.skip = new TrieCode(BDDEngine.BDDTrue);
+    public TrieCode buildSkip() {
+        if (this.skip == null)
+            this.skip = new TrieCode(BDDEngine.BDDTrue);
         return this.skip;
     }
 }
@@ -98,7 +99,7 @@ public final class BDDEngine {
         }
 
         TrieCode tmp = src;
-        for (int i = 0; i < srcSuffix; i ++) {
+        for (int i = 0; i < srcSuffix; i++) {
             if (((srcIp >> i) & 1) == 1) {
                 tmp = tmp.buildLeft(this.bdd, svars[i]);
             } else {
@@ -109,21 +110,70 @@ public final class BDDEngine {
         return bdd.ref(bdd.and(ret.result, tmp.result));
     }
 
+    public int getBestSrcIpMatch(BigInteger srcIp) {
+        TrieCode current = dst; // Start from the root of the source IP Trie
+        TrieCode bestMatch = null; // To keep track of the best match
+
+        // Iterate over each bit of the srcIp, starting from the highest order bit
+        for (int i = size - 1; i >= 0; i--) {
+            // Check if the current bit in srcIp is set (1) or not (0)
+            if (srcIp.testBit(i)) {
+                // If the bit is set, move to the left child in the Trie
+                if (current.left != null) {
+                    current = current.left;
+                    bestMatch = current; // Update best match
+                } else {
+                    break; // No further match possible
+                }
+            } else {
+                // If the bit is not set, move to the right child in the Trie
+                if (current.right != null) {
+                    current = current.right;
+                    bestMatch = current; // Update best match
+                } else {
+                    break; // No further match possible
+                }
+            }
+        }
+
+        // Return the TrieCode node that represents the best match
+        return bestMatch.result;
+    }
+
+    public boolean checkIntersection(int a, int b) {
+        // Negate the second predicate
+        int notPredicate2 = bdd.ref(bdd.not(b));
+
+        // Calculate the intersection of the first predicate and the negation of the
+        // second predicate
+        int intersection = bdd.ref(bdd.and(a, b));
+
+        // Check if the intersection is false
+        boolean isContained = intersection == BDDFalse;
+
+        // Don't forget to dereference BDD nodes when you're done with them to prevent
+        // memory leaks
+        bdd.deref(notPredicate2);
+        bdd.deref(intersection);
+
+        return !isContained;
+    }
+
     public static int refCnt = 0, defCnt = 0;
     public static double tot;
 
     public int not(int a) {
-        opCnt ++;
+        opCnt++;
         return bdd.ref(bdd.not(a));
     }
 
     public int and(int a, int b) {
-        opCnt ++;
+        opCnt++;
         return bdd.ref(bdd.and(a, b));
     }
 
     public int or(int a, int b) {
-        opCnt ++;
+        opCnt++;
         return bdd.ref(bdd.or(a, b));
     }
 
@@ -144,7 +194,7 @@ public final class BDDEngine {
     }
 
     public int xor(int a, int b) {
-        opCnt ++;
+        opCnt++;
         return bdd.ref(bdd.xor(a, b));
     }
 
