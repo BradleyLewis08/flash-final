@@ -1,0 +1,1 @@
+/usr/bin/env /opt/homebrew/Cellar/openjdk/21/libexec/openjdk.jdk/Contents/Home/bin/java @/var/folders/ph/7gz1d3515gbgwzpdnl16h90c0000gn/T/cp_b4tfhuzb4saa32jln9til0sik.argfile org.snlab.networkLoader.I2Network
