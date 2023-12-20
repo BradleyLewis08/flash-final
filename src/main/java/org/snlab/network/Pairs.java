@@ -11,7 +11,7 @@ import java.util.Scanner;
  * generating the paths
  */
 public class Pairs {
-    private HashMap<Long, HashMap<Long, Device>> destToSource;
+    private HashMap<Long, HashMap<Long, Port>> destToSource;
     private HashMap<List<Long>, List<Port>> paths;
     private Network network;
 
@@ -19,7 +19,7 @@ public class Pairs {
      * Constructor
      */
     public Pairs(String filename, Network n) {
-        destToSource = new HashMap<Long, HashMap<Long, Device>>();
+        destToSource = new HashMap<Long, HashMap<Long, Port>>();
         paths = new HashMap<List<Long>, List<Port>>();
         network = n;
         try {
@@ -29,9 +29,10 @@ public class Pairs {
                 String line = in.nextLine();
                 String[] tokens = line.split(" ");
                 Device device = network.getDevice(tokens[0]);
-                long srcIp = Long.parseLong(tokens[1]);
-                long dstIp = Long.parseLong(tokens[2]);
-                addPair(device, srcIp, dstIp);
+                Port port = device.getPort(tokens[1]);
+                long srcIp = Long.parseLong(tokens[2]);
+                long dstIp = Long.parseLong(tokens[3]);
+                addPair(port, srcIp, dstIp);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -57,7 +58,7 @@ public class Pairs {
         return destinations;
     }
 
-    public HashMap<Long, Device> getSources(long dstIp) {
+    public HashMap<Long, Port> getSources(long dstIp) {
         // Return the hashmap with all the source IPs and their associated devices
         return destToSource.get(dstIp);
     }
@@ -69,15 +70,15 @@ public class Pairs {
     /**
      * Add a pair
      */
-    public void addPair(Device device, long srcIp, long dstIp) {
+    public void addPair(Port port, long srcIp, long dstIp) {
         // Check if dstIp is inside the map
-        HashMap<Long, Device> srcIpToDevice = destToSource.get(dstIp);
+        HashMap<Long, Port> srcIpToDevice = destToSource.get(dstIp);
         if (srcIpToDevice == null) {
-            srcIpToDevice = new HashMap<Long, Device>();
-            srcIpToDevice.put(srcIp, device);
+            srcIpToDevice = new HashMap<Long, Port>();
+            srcIpToDevice.put(srcIp, port);
             destToSource.put(dstIp, srcIpToDevice);
-        } else if (!srcIpToDevice.containsKey(srcIp) || !srcIpToDevice.get(srcIp).equals(device)) {
-            srcIpToDevice.put(srcIp, device);
+        } else if (!srcIpToDevice.containsKey(srcIp) || !srcIpToDevice.get(srcIp).equals(port)) {
+            srcIpToDevice.put(srcIp, port);
         }
     }
 

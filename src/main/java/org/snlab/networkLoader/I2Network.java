@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import org.snlab.flash.OutputManager;
 import org.snlab.flash.ModelManager.ConflictFreeChanges;
 import org.snlab.flash.ModelManager.InverseModel;
 import org.snlab.flash.ModelManager.Ports.PersistentPorts;
@@ -89,6 +90,7 @@ public class I2Network {
         // System.exit(1);
         for (int i = 0; i < 1; i++) {
             Network n = getNetwork();
+
             Pairs pairs = new Pairs("dataset/pairs.txt", n);
             InverseModel verifier = new InverseModel(n, new PersistentPorts());
             long s = System.nanoTime();
@@ -99,6 +101,8 @@ public class I2Network {
             verifier.buildPaths(pairs);
 
             // Pass the paths into an output manager
+            OutputManager om = new OutputManager(pairs);
+            om.dumpCsv("output/path_test");
             System.out.println(verifier.predSize() + " " + (System.nanoTime() - s));
         }
     }

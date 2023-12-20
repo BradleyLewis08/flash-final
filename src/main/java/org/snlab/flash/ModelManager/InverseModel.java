@@ -1,5 +1,8 @@
 package org.snlab.flash.ModelManager;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +26,7 @@ public class InverseModel {
 
     private final HashMap<Rule, Integer> ruleToBddMatch;
     private final HashMap<Device, IndexedRules> deviceToRules; // FIB snapshots
+    private final HashMap<Device, Port> DEVICE_INDEX = new HashMap<>();
     public HashMap<Ports, Integer> portsToPredicate; // network inverse model
 
     private double s1 = 0, s1to2 = 0, s2 = 0, sports = 0;
@@ -251,25 +255,21 @@ public class InverseModel {
         // Manually deref BDDs used by Changes since its deconstructor doesn't handle
         // this.
         conflictFreeChanges.releaseBDDs();
-        // Count total number of items in every array of the map
-        int counter = 0;
-        for (Map.Entry<Ports, Integer> entry : portsToPredicate.entrySet()) {
-            PersistentPorts curr = (PersistentPorts) entry.getKey();
-            Integer predicate = entry.getValue();
-            // bddEngine.getBdd().printSet(predicate);
-            /*
-             * LinkedList<Port> ports = curr.getAll();
-             * for (Port p : ports) {
-             * System.out.println(p.getDevice() + " " + p.getName());
-             * }
-             */
-            // System.out.println(bddEngine.getBdd());
-            //System.out.println(curr.getAll().get(0));
-            counter++;
-            if (counter == 2) {
-                break;
+
+        // Write into a new file all the persistent ports
+        try (PrintWriter writer = new PrintWriter(new File("output/debug"))) {
+            for (Ports ports : portsToPredicate.keySet()) {
+                for (Port port : ports.getAll()) {
+                    String pad =  " ".repeat(15 - port.getDevice().getName().length());
+                    writer.println(port.getDevice().getName() + pad + port.getName());
+                }
+                writer.println("--------");
             }
+        } catch (IOException e) {
+            System.out.println("An error occurred while writing to out file");
+            e.printStackTrace();
         }
+        
         return transferredECs;
     }
 
@@ -280,7 +280,7 @@ public class InverseModel {
         for (long destination : destinations) {
             // Get the destination IP, all sources, and a current predicate match
             BigInteger destIp = BigInteger.valueOf(destination);
-            HashMap<Long, Device> sources = pairs.getSources(destination);
+            HashMap<Long, Port> sources = pairs.getSources(destination);
             int predicateMatch = bddEngine.getBestSrcIpMatch(destIp);
             Ports path = null;
 
@@ -294,27 +294,40 @@ public class InverseModel {
                 }
             }
 
+            // Cache device indeces for faster retrieval
+            if (DEVICE_INDEX.size() == 0) {
+                for (Port port : path.getAll()) {
+                    DEVICE_INDEX.put(port.getDevice(), port);
+                }
+            }
+
             // Construct each path and add to the pairs class
             for (long source : sources.keySet()) {
-                Device sourceDevice = sources.get(source);
+                //System.out.println("Source: " + source + " Destination: " + destination);
+                
+                Port sourcePort = sources.get(source);
 
                 ArrayList<Port> portsPath = new ArrayList<>();
                 ArrayList<Long> pair = new ArrayList<>();
+                portsPath.add(sourcePort);
                 pair.add(source);
                 pair.add(destination);
 
-                boolean isInPath = false;
-                for (Port port : path.getAll()) {
-                    // Get the destination port
-                    if (port.getDevice() == sourceDevice) {
-                        isInPath = true;
-                    }
+                do {
+                    // Get current device
+                    Device sourceDevice = sourcePort.getDevice();
 
-                    if (isInPath) {
-                        portsPath.add(port);
-                    }
-                }
+                    // Index by device to find next jump
+                    Port nextHop = DEVICE_INDEX.get(sourceDevice);
 
+                    // Add jump to path
+                    portsPath.add(nextHop);
+
+                    // reset source port
+                    sourcePort = nextHop.getPeer();
+                } while (sourcePort != null);
+
+                //System.out.println("--------");
                 pairs.addPath(pair, portsPath);
             }
         }
