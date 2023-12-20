@@ -1,0 +1,79 @@
+{
+  "name": "Test Network",
+  "devices": [
+    {
+      "deviceId": "Device1",
+      "ports": ["Port1", "Port2", "Port3"]
+    },
+    {
+      "deviceId": "Device2",
+      "ports": ["Port1", "Port2"]
+    },
+    {
+      "deviceId": "Device3",
+      "ports": ["Port1", "Port2", "Port3", "Port4"]
+    }
+  ],
+  "links": [
+    {
+      "source": {
+        "deviceId": "Device1",
+        "portId": "Port1"
+      },
+      "destination": {
+        "deviceId": "Device2",
+        "portId": "Port1"
+      }
+    },
+    {
+      "source": {
+        "deviceId": "Device1",
+        "portId": "Port2"
+      },
+      "destination": {
+        "deviceId": "Device2",
+        "portId": "Port2"
+      }
+    },
+    {
+      "source": {
+        "deviceId": "Device1",
+        "portId": "Port3"
+      },
+      "destination": {
+        "deviceId": "Device3",
+        "portId": "Port1"
+      }
+    },
+    {
+      "source": {
+        "deviceId": "Device3",
+        "portId": "Port2"
+      },
+      "destination": {
+        "deviceId": "Device2",
+        "portId": "Port1"
+      }
+    },
+    {
+      "source": {
+        "deviceId": "Device3",
+        "portId": "Port3"
+      },
+      "destination": {
+        "deviceId": "Device2",
+        "portId": "Port2"
+      }
+    },
+    {
+      "source": {
+        "deviceId": "Device3",
+        "portId": "Port4"
+      },
+      "destination": {
+        "deviceId": "Device1",
+        "portId": "Port3"
+      }
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import org.jgrapht.alg.util.Pair;
 import java.util.*;
 
 public class Network {
-    //    private Graph<Device, Link> graph;
+    // private Graph<Device, Link> graph;
     private final LinkedHashMap<String, Device> nameToDevice;
     private ArrayList<Rule> initialRules;
     private final HashSet<Device> devices; // for quick check rules related to a partition
@@ -101,19 +101,30 @@ public class Network {
             n.addDevice(device);
         }
 
-//        for (Rule rule : this.initialRules) {
-//            if (devices.contains(rule.getDevice())) {
-//                n.addInitialRule(rule);
-//            }
-//        }
+        // for (Rule rule : this.initialRules) {
+        // if (devices.contains(rule.getDevice())) {
+        // n.addInitialRule(rule);
+        // }
+        // }
         return n;
     }
 
     public void filterIntoSubsapce(long subnet, long mask) {
         ArrayList<Rule> filtered = new ArrayList<>();
         for (Rule rule : initialRules) {
-            if ((rule.getMatch().longValue() & mask) == subnet) filtered.add(rule);
+            if ((rule.getMatch().longValue() & mask) == subnet)
+                filtered.add(rule);
         }
         this.initialRules = filtered;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Network: " + this.name + "\n");
+        for (Device device : this.nameToDevice.values()) {
+            sb.append(device.toString());
+        }
+        return sb.toString();
     }
 }

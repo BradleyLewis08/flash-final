@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Rule {
     private int src, srcSuffix;
     private BigInteger match;
-//    private BigInteger dstIp;
+    // private BigInteger dstIp;
     private int prefix, priority;
     private Port outPort;
     private Device device;
@@ -15,7 +15,6 @@ public class Rule {
     public Rule(Device device, long ipv4, int prefix, Port outPort) {
         this(device, ipv4, prefix, prefix, outPort);
     }
-
 
     public Rule(Device device, long ipv4, int prefix, int priority, Port outPort) {
         this.device = device;
@@ -36,11 +35,27 @@ public class Rule {
         this.srcSuffix = srcSuffix;
     }
 
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "src=" + src +
+                ", srcSuffix=" + srcSuffix +
+                ", match=" + match +
+                ", prefix=" + prefix +
+                ", priority=" + priority +
+                ", outPort=" + outPort +
+                ", device=" + device +
+                ", isLast=" + isLast +
+                '}';
+    }
+
     public void setPriority(int priority) {
         this.priority = priority;
     }
+
     public void setRandomOutPort() {
-        this.outPort = this.device.getPorts().stream().skip((int) (this.device.getPorts().size() * Math.random())).findFirst().get();
+        this.outPort = this.device.getPorts().stream().skip((int) (this.device.getPorts().size() * Math.random()))
+                .findFirst().get();
     }
 
     public Device getDevice() {
@@ -81,10 +96,13 @@ public class Rule {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         Rule rule = (Rule) o;
-        return priority == rule.priority && prefix == rule.prefix && Objects.equals(match, rule.match) && outPort == rule.outPort && device == rule.device;
+        return priority == rule.priority && prefix == rule.prefix && Objects.equals(match, rule.match)
+                && outPort == rule.outPort && device == rule.device;
     }
 
     @Override
