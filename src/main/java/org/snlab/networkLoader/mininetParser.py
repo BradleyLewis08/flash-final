@@ -36,7 +36,7 @@ def parse():
     exits = []
     for port in link_dict:
         if link_dict[port] not in link_dict:
-            exits.append((port, port_to_name[port]))
+            exits.append((port, link_dict[port], port_to_name[port]))
 
     for ex in exits:
         link_dict.pop(ex[0])
@@ -140,20 +140,44 @@ def parse():
                     pred[n] = curr
                     queue.append(n)
 
-    paths_to_take = collections.defaultdict(list)
+
+    device_to_paths = {}
     for node in adjacency_list:
+        paths_to_take = {}
         visisted = set()
         pred = {}
         bfs(node)
+        for p in pred:
+            curr = p
+            while pred[curr] != node:
+                curr = pred[curr]
+
+            paths_to_take[p] = [pair_to_port[(node, curr)], pair_to_port[(curr, node)]]
         for pair in exits:
-            _port, name = pair
+            egress, ingress, name = pair
             curr = name_to_ip[name]
             if curr in pred:
                 while pred[curr] != node:
                     curr = pred[curr]
-                paths_to_take[ip_to_name[node]].append(pair_to_port[(node, curr)])
+                paths_to_take[name_to_ip[name]] = [pair_to_port[(node, curr)], pair_to_port[(curr, node)]]
             else:
-                paths_to_take[ip_to_name[node]].append(_port)
+                paths_to_take[name_to_ip[name]] = [egress, ingress]
+        device_to_paths[ip_to_name[node]] = paths_to_take
+
+
+    print(device_to_paths)
+    print(exits)
+
+        # This code generates only for the exit code
+        # for pair in exits:
+        #     _port, name = pair
+        #     curr = name_to_ip[name]
+        #     if curr in pred:
+        #         while pred[curr] != node:
+        #             curr = pred[curr]
+        #         paths_to_take[ip_to_name[node]].append(pair_to_port[(node, curr)])
+        #     else:
+        #         paths_to_take[ip_to_name[node]].append(_port)
 
         # for ele in pred:
         #     curr = ele
@@ -164,7 +188,6 @@ def parse():
         # curr =
         # paths_to_take[pair_to_port[(pair, curr)]].append(ele)
 
-    print(paths_to_take)
 
 
     def subnet_mask_to_cidr(mask):
@@ -173,21 +196,32 @@ def parse():
         # Count the number of consecutive 1s from the start
         return binary_str.count('1')
 
-    for device in paths_to_take:
-        f = open(device+"ap", 'w+')
+    for device in device_to_paths:
+        f = open("new"+device+"ap.fib", 'w+')
+        f.write("Routing table: "+device+".inet\n")
+        f.write("Internet:\n")
+        f.write("Destination        Type   Next hop       Type Index NhRef Netif\n")
 
-        ip = name_to_ip[device]
-        mask = ip_to_mask[ip]
+        for idx, dest in enumerate(device_to_paths[device]):
+            mask = ip_to_mask[dest]
+            prefix = subnet_mask_to_cidr(mask)
+            dest_string = (dest+"/"+str(prefix)).ljust(len("Destination        "))
 
-        prefix = subnet_mask_to_cidr(mask)
+            type_string = "dest".ljust(len("Type   "))
 
-        port = paths_to_take[device][0]
+            egress, ingress = device_to_paths[device][dest]
+            hop_string = (ingress).ljust(len("Next hop       "))
 
-        f.write(f'fw 155.155.1.0 {prefix} {port}')
+            type_string2 = "dest".ljust(len("dest  "))
 
+            index_string = ("10" + str(idx)).ljust(len("101    "))
+
+            nhref_string = "1   "
+
+            netif_string = egress
+
+            f.write(dest_string+type_string+hop_string+type_string2+index_string+nhref_string+netif_string+"\n")
         f.close()
-
-
 
 if __name__ == "__main__":
     parse()
