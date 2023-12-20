@@ -52,7 +52,7 @@ def parse():
 
     raw = []
     for i in range(4):
-        f_name = "r" + str(i) + ".fib"
+        f_name = "minir" + str(i) + ".fib"
 
         f = open(f_name, 'r')
 
