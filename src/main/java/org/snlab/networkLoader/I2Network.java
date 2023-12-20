@@ -94,7 +94,11 @@ public class I2Network {
             long s = System.nanoTime();
             ConflictFreeChanges cgs = verifier.insertMiniBatch(n.getInitialRules());
             verifier.update(cgs);
+            
+            // Build paths for all relevant source destination pairs
             verifier.buildPaths(pairs);
+
+            // Pass the paths into an output manager
             System.out.println(verifier.predSize() + " " + (System.nanoTime() - s));
         }
     }

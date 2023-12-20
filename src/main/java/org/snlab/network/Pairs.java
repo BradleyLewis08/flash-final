@@ -50,7 +50,6 @@ public class Pairs {
         int i = 0;
         
         for (long dstIp : destToSource.keySet()) {
-            System.out.println(dstIp);
             destinations[i] = dstIp;
             i++;
         }
@@ -87,6 +86,17 @@ public class Pairs {
      */
     public void addPath(List<Long> pair, List<Port> path) {
         paths.put(pair, path);
+    }
+
+    public void printPaths() {
+        for (List<Long> pair : paths.keySet()) {
+            System.out.println("--------");
+            System.out.println("Source: " + pair.get(0));
+            System.out.println("Destination: " + pair.get(1));
+            for (Port port : paths.get(pair)) {
+                System.out.println(port  + " " + port.getDevice().getName());
+            }
+        }
     }
 
 }

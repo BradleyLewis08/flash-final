@@ -264,7 +264,7 @@ public class InverseModel {
              * }
              */
             // System.out.println(bddEngine.getBdd());
-            System.out.println(curr.getAll().get(0));
+            //System.out.println(curr.getAll().get(0));
             counter++;
             if (counter == 2) {
                 break;
@@ -274,48 +274,48 @@ public class InverseModel {
     }
 
     public void buildPaths(Pairs pairs) {
-        // For each destination
+
         long[] destinations = pairs.getDestinations();
+
         for (long destination : destinations) {
-            // Get all the sources and the path list for the destination
+            // Get the destination IP, all sources, and a current predicate match
             BigInteger destIp = BigInteger.valueOf(destination);
             HashMap<Long, Device> sources = pairs.getSources(destination);
             int predicateMatch = bddEngine.getBestSrcIpMatch(destIp);
             Ports path = null;
-            // System.out.println("MATCH IS:" + predicateMatch);
-            bddEngine.getBdd().printSet(predicateMatch);
-            // Find predicateMatch inside portsToPredicate
+
+            // Find the best union predicate match inside the EC
             for (Ports ports : portsToPredicate.keySet()) {
                 Integer predicate = portsToPredicate.get(ports);
                 if (bddEngine.checkIntersection(predicateMatch, predicate)) {
-                    // System.out.println("MATCHED: " + predicate + " with " + predicateMatch);
                     predicateMatch = predicate;
                     path = ports;
                     break;
                 }
             }
 
-            System.out.println("NORMAL PATH:");
-            System.out.println(path.getAll());
-            System.out.println("CONSTRUCTED PATH:");
-
+            // Construct each path and add to the pairs class
             for (long source : sources.keySet()) {
-                // Get the source device
                 Device sourceDevice = sources.get(source);
-                // Get the source IP
-                BigInteger srcIp = BigInteger.valueOf(source);
 
-                boolean isOn = false;
+                ArrayList<Port> portsPath = new ArrayList<>();
+                ArrayList<Long> pair = new ArrayList<>();
+                pair.add(source);
+                pair.add(destination);
+
+                boolean isInPath = false;
                 for (Port port : path.getAll()) {
                     // Get the destination port
                     if (port.getDevice() == sourceDevice) {
-                        isOn = true;
+                        isInPath = true;
                     }
 
-                    if (isOn) {
-                        System.out.println(port.getName() + " " + port.getDevice().getName());
+                    if (isInPath) {
+                        portsPath.add(port);
                     }
                 }
+
+                pairs.addPath(pair, portsPath);
             }
         }
     }
