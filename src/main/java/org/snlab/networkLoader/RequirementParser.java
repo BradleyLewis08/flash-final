@@ -15,6 +15,9 @@ import org.snlab.network.Rule;
 
 public class RequirementParser {
 	public static void parseAndAddRules(String requirementsFileName, String requirementsFileType, Network n) {
+		if (requirementsFileType.equals("junos")) {
+			JunosFibParser.parseAndAddRules(requirementsFileName, n);
+		}
 		if (requirementsFileType.equals("custom")) {
 			JSONRequirementsParser.parseAndAddRules(requirementsFileName, n);
 		} else if (requirementsFileType.equals("mininet")) { // TODO implement

@@ -42,10 +42,22 @@ public class JSONRequirementsParser {
 		if (device.getPort(pn) == null) {
 			device.addPort(pn);
 		}
-		long ip = Long.parseLong(tokens[1]);
-		Rule rule = new Rule(device, ip, Integer.parseInt(tokens[2]), device.getPort(pn));
+		Rule rule = new Rule(device, Long.parseLong(tokens[1]), Integer.parseInt(tokens[2]), device.getPort(pn));
 		device.addInitialRule(rule);
 		n.addInitialRule(rule);
+	}
+
+	private static long convertIpToLong(String ipAddress) {
+		String[] ipAddressInArray = ipAddress.split("/")[0].split("\\.");
+
+		long result = 0;
+		for (int i = 0; i < ipAddressInArray.length; i++) {
+			int power = 3 - i;
+			int octet = Integer.parseInt(ipAddressInArray[i]);
+			result += octet * Math.pow(256, power);
+		}
+
+		return result;
 	}
 
 	private static void addRules(String filename, String deviceId, Network n) {
@@ -83,20 +95,9 @@ public class JSONRequirementsParser {
 		if ("dest".equalsIgnoreCase(type)) {
 			String ip = destination.split("/")[0];
 			int subnet = Integer.parseInt(destination.split("/")[1]);
-			int ipAsInt = ipToInt(ip);
-			return "fw " + ipAsInt + " " + subnet + " " + netIf;
+			long ipAsLong = convertIpToLong(ip);
+			return "fw " + ipAsLong + " " + subnet + " " + netIf;
 		}
 		return null;
-	}
-
-	private static int ipToInt(String ipAddress) {
-		try {
-			InetAddress inetAddress = InetAddress.getByName(ipAddress);
-			byte[] bytes = inetAddress.getAddress();
-			return ByteBuffer.wrap(bytes).getInt();
-		} catch (Exception e) {
-			System.err.println("Invalid IP address: " + ipAddress);
-			return 0;
-		}
 	}
 }

@@ -1,3 +1,7 @@
-Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
-163.203.1.0     0.0.0.0         255.255.255.0   U     0      0        0 r2-eth0
-163.203.1.0     0.0.0.0         255.255.255.0   U     0      0        0 r2-eth1
+Routing table: r0.inet
+Internet:
+Destination        Type   Next hop       Type Index NhRef Netif
+175.203.1.0/24     dest   r1-eth0        dest  100    1   r0-eth0
+163.203.1.0/24     dest   r1-eth0        dest  101    1   r0-eth0
+155.155.1.0/24     dest   r1-eth0        dest  102    1   r0-eth0
+155.155.1.1/24     dest   ge-eth0        dest  103    1   r3-eth1

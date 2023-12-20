@@ -12,8 +12,8 @@ import org.snlab.network.Device;
 import org.snlab.network.Rule;
 
 public class CustomNetwork {
-	private static final String REQUIREMENTS_FILE = "/Users/bradleylewis/Desktop/flash/src/main/java/org/snlab/networkLoader/test_requirements.json;"; // TODO
-	private static final String TOPOLOGY_FILE = "/Users/alexshi/Documents/Yale/F23/CPSC434/flash/src/main/java/org/snlab/networkLoader/testnet.config";
+	private static final String REQUIREMENTS_FILE = "/Users/bradleylewis/Desktop/flash/src/main/java/org/snlab/networkLoader/test_requirements.json"; // TODO
+	private static final String TOPOLOGY_FILE = "/Users/bradleylewis/Documents/flash/src/main/java/org/snlab/networkLoader/topology.out";
 
 	public Network network;
 

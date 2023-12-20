@@ -50,15 +50,6 @@ public class TopologyParser {
 		return n;
 	}
 
-	public static void parseAndAddLink(String[] linkParts, Network network) {
-		assert (linkParts.length == 2);
-		String[] srcDeviceAndPort = linkParts[0].split("-");
-		String[] destDeviceAndPort = linkParts[1].split("-");
-		assert (srcDeviceAndPort.length == 2 && destDeviceAndPort.length == 2);
-		// Check if link has already been added
-		network.addLink(srcDeviceAndPort[0], srcDeviceAndPort[1], destDeviceAndPort[0], destDeviceAndPort[1]);
-	}
-
 	// Mininet includes both directions of the link, i.e h1:eth1-h2:eth2 and
 	// h2:eth2-h1:eth1. We should only include one of these in the calls to addLink.
 	public static Boolean linkAdded(String[] linkParts, ArrayList<String> addedLinks) {
@@ -71,7 +62,6 @@ public class TopologyParser {
 			String line;
 			int lineIndex = 0;
 			Network network = new Network();
-			ArrayList<String> addedLinks = new ArrayList<String>();
 			while ((line = reader.readLine()) != null) {
 				line = line.trim();
 				System.out.println(line);
@@ -82,19 +72,9 @@ public class TopologyParser {
 						network.addDevice(device);
 					}
 				} else {
-					String[] parts = line.split("\\s+", 2); // First part is device name, second part is links
-					if (parts.length == 2) {
-						// Split the links
-						String[] links = parts[1].split("\\s+"); // Split all links by whitespace
-						for (String link : links) {
-							String[] linkParts = link.split(":"); // device1-egress_port:device2-egress_port
-
-							if (linkParts.length == 2 && !linkAdded(linkParts, addedLinks)) {
-								parseAndAddLink(linkParts, network);
-								addedLinks.add(link);
-							}
-						}
-					}
+					String[] parts = line.split("\\s+"); // First part is device name, second part is links
+					assert parts.length == 4;
+					network.addLink(parts[0], parts[1], parts[2], parts[3]);
 				}
 				lineIndex++;
 			}
