@@ -20,7 +20,7 @@ public class CustomNetwork {
 	public CustomNetwork(String topologyConfigPath, String requirementsConfigPath) {
 		try {
 			Network n = TopologyParser.createNetwork(TOPOLOGY_FILE, "mininet");
-			// RequirementParser.parseAndAddRules(REQUIREMENTS_FILE, "custom", n);
+			RequirementParser.parseAndAddRules(REQUIREMENTS_FILE, "custom", n);
 			network = n;
 		} catch (IOException e) {
 			e.printStackTrace();

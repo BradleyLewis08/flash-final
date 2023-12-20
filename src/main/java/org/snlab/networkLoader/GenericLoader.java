@@ -14,8 +14,7 @@ import org.snlab.network.Pairs;
 import org.snlab.network.Rule;
 
 public class GenericLoader {
-    static public String[] devicenames = { "atla", "chic", "hous", "kans", "losa", "newy32aoa", "salt", "seat",
-            "wash" };
+    static public String[] devicenames = { "r0", "r1", "r2", "r3" };
 
     public static Network getNetwork() {
         Network n = getTopo();
@@ -24,7 +23,7 @@ public class GenericLoader {
             Device device = n.getDevice(name);
             try {
                 // List all current directories in current directory
-                Scanner in = new Scanner(new File("dataset/I2/" + name + "apnotcomp"));
+                Scanner in = new Scanner(new File( name + "ap"));
                 while (in.hasNextLine()) {
                     String line = in.nextLine();
                     String[] tokens = line.split(" ");
@@ -51,34 +50,9 @@ public class GenericLoader {
             n.addDevice(name);
         }
 
-        n.addLink("chic", "xe-0/1/0", "newy32aoa", "xe-0/1/3");
-        n.addLink("chic", "xe-1/0/1", "kans", "xe-0/1/0");
-        n.addLink("chic", "xe-1/1/3", "wash", "xe-6/3/0");
-        n.addLink("hous", "xe-3/1/0", "losa", "ge-6/0/0");
-        n.addLink("kans", "ge-6/0/0", "salt", "ge-6/1/0");
-        n.addLink("chic", "xe-1/1/2", "atla", "xe-0/1/3");
-        n.addLink("seat", "xe-0/0/0", "salt", "xe-0/1/1");
-        n.addLink("chic", "xe-1/0/2", "kans", "xe-0/0/3");
-        n.addLink("hous", "xe-1/1/0", "kans", "xe-1/0/0");
-        n.addLink("seat", "xe-0/1/0", "losa", "xe-0/0/0");
-        n.addLink("salt", "xe-0/0/1", "losa", "xe-0/1/3");
-        n.addLink("seat", "xe-1/0/0", "salt", "xe-0/1/3");
-        n.addLink("newy32aoa", "et-3/0/0-0", "wash", "et-3/0/0-0");
-        n.addLink("newy32aoa", "et-3/0/0-1", "wash", "et-3/0/0-1");
-        n.addLink("chic", "xe-1/1/1", "atla", "xe-0/0/0");
-        n.addLink("losa", "xe-0/1/0", "seat", "xe-2/1/0");
-        n.addLink("hous", "xe-0/1/0", "losa", "ge-6/1/0");
-        n.addLink("atla", "xe-0/0/3", "wash", "xe-1/1/3");
-        n.addLink("hous", "xe-3/1/0", "kans", "ge-6/2/0");
-        n.addLink("atla", "ge-6/0/0", "hous", "xe-0/0/0");
-        n.addLink("chic", "xe-1/0/3", "kans", "xe-1/0/3");
-        n.addLink("losa", "xe-0/0/3", "salt", "xe-0/1/0");
-        n.addLink("atla", "ge-6/1/0", "hous", "xe-1/0/0");
-        n.addLink("atla", "xe-1/0/3", "wash", "xe-0/0/0");
-        n.addLink("chic", "xe-2/1/3", "wash", "xe-0/1/3");
-        n.addLink("atla", "xe-1/0/1", "wash", "xe-0/0/3");
-        n.addLink("kans", "xe-0/1/1", "salt", "ge-6/0/0");
-        n.addLink("chic", "xe-1/1/0", "newy32aoa", "xe-0/0/0");
+        n.addLink("r0", "r0-eth0", "r1", "r1-eth0");
+        n.addLink("r1", "r1-eth1", "r2", "r2-eth0");
+        n.addLink("r2", "r2-eth1", "r3", "r3-eth0");
 
         n.getAllDevices().forEach(device -> device.uid = Device.cnt++);
         return n;
@@ -90,7 +64,7 @@ public class GenericLoader {
         Network n = getNetwork();
 
         // Build Equivalence Classes
-        Pairs pairs = new Pairs("dataset/pairs.txt", n);
+        Pairs pairs = new Pairs("pairinput.txt", n);
         InverseModel verifier = new InverseModel(n, new PersistentPorts());
         ConflictFreeChanges cgs = verifier.insertMiniBatch(n.getInitialRules());
         verifier.update(cgs);
