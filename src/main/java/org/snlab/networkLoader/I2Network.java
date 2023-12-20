@@ -85,7 +85,7 @@ public class I2Network {
     }
 
     public static void main(String[] args) {
-        System.out.println(getNetwork().getInitialRules().size());
+        //System.out.println(getNetwork().getInitialRules().size());
 
         // System.exit(1);
         for (int i = 0; i < 1; i++) {
