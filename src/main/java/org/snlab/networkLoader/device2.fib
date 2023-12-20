@@ -1,0 +1,6 @@
+Routing table: Device2.inet
+Internet:
+Destination        Type   Next hop       Type Index NhRef Netif
+10.0.0.0/24        dest                 locl  201    1    Port1
+172.16.1.0/24      dest                 locl  202    1    Port2
+10.1.1.0/24        dest   Device3-Port2  dest  203    1    Port1

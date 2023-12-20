@@ -1,0 +1,13 @@
+{
+  "fibsByDevice": [
+    {
+      "Device1": "/Users/bradleylewis/Desktop/flash/src/main/java/org/snlab/networkLoader/device1.fib"
+    },
+    {
+      "Device2": "/Users/bradleylewis/Desktop/flash/src/main/java/org/snlab/networkLoader/device2.fib"
+    },
+    {
+      "Device3": "/Users/bradleylewis/Desktop/flash/src/main/java/org/snlab/networkLoader/device3.fib"
+    }
+  ]
+}
