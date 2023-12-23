@@ -32,6 +32,10 @@ public class Network {
         return this.nameToDevice;
     }
 
+    public String[] getDeviceNames() {
+        return this.nameToDevice.keySet().toArray(new String[0]);
+    }
+
     public Network setName(String name) {
         this.name = name;
         return this;
