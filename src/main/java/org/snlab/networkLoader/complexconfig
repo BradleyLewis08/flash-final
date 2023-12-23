@@ -1,0 +1,4 @@
+r0 r0-eth0:r1-eth0
+r1 r1-eth0:r0-eth0 r1-eth1:r2-eth0 r1-eth2:r3-eth2
+r2 r2-eth0:r1-eth1 r2-eth1:r3-eth0
+r3 r3-eth0:r2-eth1 r3-eth2:r1-eth2

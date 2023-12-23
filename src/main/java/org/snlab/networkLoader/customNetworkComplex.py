@@ -30,6 +30,8 @@ class NetworkTopo( Topo ):
         r2 = self.addNode('r2', cls=LinuxRouter, ip='163.203.1.1/24')
         r3 = self.addNode('r3', cls=LinuxRouter, ip='155.155.1.1/24')
 
+        # h1 = self.addHost( 'h1', ip="457.212.1.1/24", defaultRoute='via 155.155.1.1')
+
         self.addLink(r0, r1,
                      intfName1='r0-eth0', intfName2='r1-eth0',
                      params1={'ip': '192.168.1.1/24'}, params2={'ip': '175.203.1.1/24'})
@@ -39,7 +41,11 @@ class NetworkTopo( Topo ):
         self.addLink(r2, r3,
                      intfName1='r2-eth1', intfName2='r3-eth0',
                      params1={'ip': '163.203.1.1/24'}, params2={'ip': '155.155.1.1/24'})
+        self.addLink(r1, r3,
+                     intfName1='r1-eth2', intfName2='r3-eth2',
+                     params1={'ip': '175.203.1.1/24'}, params2={'ip': '155.155.1.1/24'})
 
+        # self.addLink(r3, h1)
 
 
 def run():

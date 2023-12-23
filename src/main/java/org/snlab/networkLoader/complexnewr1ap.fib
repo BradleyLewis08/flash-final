@@ -1,0 +1,6 @@
+Routing table: r1.inet
+Internet:
+Destination        Type   Next hop       Type Index NhRef Netif
+192.168.1.0/24     dest   r0-eth0        dest  100    1   r1-eth0
+163.203.1.0/24     dest   r2-eth0        dest  101    1   r1-eth1
+155.155.1.0/24     dest   r2-eth0        dest  102    1   r1-eth1

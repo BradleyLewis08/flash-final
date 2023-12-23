@@ -79,7 +79,7 @@ public class InverseModel {
 
     /**
      * Notates current data-plane (flow rules) as f, consider transition to f'
-     * 
+     *
      * @param insertions f' - f
      * @param deletions  f - f'
      * @return the change \chi
