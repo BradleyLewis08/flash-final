@@ -260,7 +260,7 @@ public class InverseModel {
         try (PrintWriter writer = new PrintWriter(new File("output/debug"))) {
             for (Ports ports : portsToPredicate.keySet()) {
                 for (Port port : ports.getAll()) {
-                    String pad =  " ".repeat(15 - port.getDevice().getName().length());
+                    String pad = " ".repeat(15 - port.getDevice().getName().length());
                     writer.println(port.getDevice().getName() + pad + port.getName());
                 }
                 writer.println("--------");
@@ -269,7 +269,7 @@ public class InverseModel {
             System.out.println("An error occurred while writing to out file");
             e.printStackTrace();
         }
-        
+
         return transferredECs;
     }
 
@@ -295,16 +295,14 @@ public class InverseModel {
             }
 
             // Cache device indeces for faster retrieval
-            if (DEVICE_INDEX.size() == 0) {
-                for (Port port : path.getAll()) {
-                    DEVICE_INDEX.put(port.getDevice(), port);
-                }
+            for (Port port : path.getAll()) {
+                DEVICE_INDEX.put(port.getDevice(), port);
             }
 
             // Construct each path and add to the pairs class
             for (long source : sources.keySet()) {
-                //System.out.println("Source: " + source + " Destination: " + destination);
-                
+                // System.out.println("Source: " + source + " Destination: " + destination);
+
                 Port sourcePort = sources.get(source);
 
                 ArrayList<Port> portsPath = new ArrayList<>();
@@ -327,7 +325,7 @@ public class InverseModel {
                     sourcePort = nextHop.getPeer();
                 } while (sourcePort != null);
 
-                //System.out.println("--------");
+                // System.out.println("--------");
                 pairs.addPath(pair, portsPath);
             }
         }
