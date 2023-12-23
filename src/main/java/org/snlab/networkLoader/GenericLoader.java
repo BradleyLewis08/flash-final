@@ -14,16 +14,20 @@ import org.snlab.network.Pairs;
 import org.snlab.network.Rule;
 
 public class GenericLoader {
-    static public String[] devicenames = { "r0", "r1", "r2", "r3" };
 
-    public static Network getNetwork() {
+    public static Network getNetwork() throws Exception {
         Network n = getTopo();
+        RequirementParser.parseAndAddRules("test_requirements.json", "custom", n);
+        String[] deviceNames = n.getDeviceNames();
 
-        for (String name : devicenames) {
+        for (String name : deviceNames) {
             Device device = n.getDevice(name);
             try {
+                if (name.equals("h1") || name.equals("h2")) {
+                    continue;
+                }
                 // List all current directories in current directory
-                Scanner in = new Scanner(new File( name + "ap"));
+                Scanner in = new Scanner(new File(name + "ap"));
                 while (in.hasNextLine()) {
                     String line = in.nextLine();
                     String[] tokens = line.split(" ");
@@ -43,37 +47,36 @@ public class GenericLoader {
         return n;
     }
 
-    public static Network getTopo() {
-        Network n = new Network("Internet2");
-
-        for (String name : devicenames) {
-            n.addDevice(name);
+    public static Network getTopo() throws Exception {
+        try {
+            Network n = TopologyParser.createNetwork("topology.out", "mininet");
+            n.getAllDevices().forEach(device -> device.uid = Device.cnt++);
+            return n;
+        } catch (Exception e) {
+            throw new Exception("Error parsing topology file: " + e.getMessage());
         }
-
-        n.addLink("r0", "r0-eth0", "r1", "r1-eth0");
-        n.addLink("r1", "r1-eth1", "r2", "r2-eth0");
-        n.addLink("r2", "r2-eth1", "r3", "r3-eth0");
-
-        n.getAllDevices().forEach(device -> device.uid = Device.cnt++);
-        return n;
     }
 
     public static void main(String[] args) {
-        System.out.println(getNetwork().getInitialRules().size());
+        try {
 
-        Network n = getNetwork();
+            Network n = getNetwork();
+            System.out.println(n);
 
-        // Build Equivalence Classes
-        Pairs pairs = new Pairs("pairinput.txt", n);
-        InverseModel verifier = new InverseModel(n, new PersistentPorts());
-        ConflictFreeChanges cgs = verifier.insertMiniBatch(n.getInitialRules());
-        verifier.update(cgs);
+            // Build Equivalence Classes
+            Pairs pairs = new Pairs("pairinput.txt", n);
+            InverseModel verifier = new InverseModel(n, new PersistentPorts());
+            ConflictFreeChanges cgs = verifier.insertMiniBatch(n.getInitialRules());
+            verifier.update(cgs);
 
-        // Build paths for all relevant source destination pairs
-        verifier.buildPaths(pairs);
+            // Build paths for all relevant source destination pairs
+            verifier.buildPaths(pairs);
 
-        // Pass the paths into an output manager
-        OutputManager om = new OutputManager(pairs);
-        om.dumpCsv("output/path_test");
+            // Pass the paths into an output manager
+            OutputManager om = new OutputManager(pairs);
+            om.dumpCsv("output/path_test");
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        }
     }
 }

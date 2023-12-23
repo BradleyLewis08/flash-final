@@ -2,7 +2,9 @@ package org.snlab.networkLoader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.regex.Pattern;
@@ -19,10 +21,10 @@ import org.snlab.network.Rule;
 public class JSONRequirementsParser {
 	public static void parseAndAddRules(String requirementsFileName, Network n) {
 		try {
-			JsonObject requirements = NWJsonReader.readJson(
-					"/Users/bradleylewis/Desktop/flash/src/main/java/org/snlab/networkLoader/test_requirements.json");
+			JsonObject requirements = NWJsonReader.readJson("test_requirements.json");
 
 			JsonArray fibs = requirements.getJsonArray("fibsByDevice");
+			System.out.println(fibs);
 			for (JsonObject deviceToFile : fibs.getValuesAs(JsonObject.class)) {
 				deviceToFile.forEach((device, value) -> {
 					String fileName = value.toString().replace("\"", "");
@@ -61,9 +63,13 @@ public class JSONRequirementsParser {
 	}
 
 	private static void addRules(String filename, String deviceId, Network n) {
-		try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+		String outputFilename = deviceId + "ap";
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filename));
+				PrintWriter writer = new PrintWriter(new FileWriter(outputFilename, true))) {
+
 			String line;
-			Boolean entries = false; // True if we are in the entries section
+			boolean entries = false; // True if we are in the entries section
 			while ((line = reader.readLine()) != null) {
 				String[] parts = line.trim().split("\\s+");
 				if (parts[0].equals("Destination")) { // Next line is the rule
@@ -74,8 +80,10 @@ public class JSONRequirementsParser {
 					continue;
 				}
 				String parsedRequirementLine = processLine(line, deviceId);
+				System.out.println("DeviceID " + deviceId + ": " + parsedRequirementLine);
 				if (parsedRequirementLine != null) {
-					addRuleToNetwork(deviceId, parsedRequirementLine, n);
+					// addRuleToNetwork(deviceId, parsedRequirementLine, n);
+					writer.println(parsedRequirementLine); // Write the parsed line to the file
 				}
 			}
 		} catch (IOException e) {

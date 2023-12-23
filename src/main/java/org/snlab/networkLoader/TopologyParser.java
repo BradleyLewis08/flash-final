@@ -85,6 +85,8 @@ public class TopologyParser {
 		}
 	}
 
+	// device names can be generated
+
 	public static Network createNetwork(String filename, String fileType) throws IOException {
 		if (fileType.equals("custom")) {
 			return createTopologyFromJSON(filename);
