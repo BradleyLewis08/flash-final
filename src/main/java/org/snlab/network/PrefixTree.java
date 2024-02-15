@@ -69,10 +69,15 @@ public class PrefixTree {
     }
 
     public void updatePredicateReference(int predicate, int newPredicate) {
-        PredicateReference reference = this.predicatesToReferences.get(predicate);
-        reference.setPredicate(newPredicate);
-        predicatesToReferences.remove(predicate);
-        predicatesToReferences.put(newPredicate, reference);
+        if (!this.predicatesToReferences.containsKey(predicate)) {
+            PredicateReference reference = new PredicateReference(predicate);
+            this.predicatesToReferences.put(predicate, reference);
+        } else {
+            PredicateReference reference = this.predicatesToReferences.get(predicate);
+            reference.setPredicate(newPredicate);
+            predicatesToReferences.remove(predicate);
+            predicatesToReferences.put(newPredicate, reference);
+        }
     }
 
     // Update an existing node of the tree, or add a new one if it doesn't exist
