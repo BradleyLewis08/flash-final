@@ -45,7 +45,7 @@ public class PrefixTree {
     private TreeNode root;
 
     // Constructor
-    public PrefixTree() {
+    public PrefixTree(int defaultPredicate) {
         this.root = new TreeNode(BigInteger.ZERO, 0);
     }
 
@@ -86,22 +86,55 @@ public class PrefixTree {
 
     // Traverse the tree and return the best match predicate
     public int getPredicate(BigInteger prefix) {
+        // Preprocessing
+        prefix = prefix.shiftLeft(32 - prefix.bitLength());
+        
         // Traverse the tree and return the best match predicate
+        TreeNode temp = this.root;
+        int predicateMatch = temp.getPredicate();
 
+        for (int i = 31; i >= 0; i--) {
+            // current node doesn't exist or doesn't match
+            if (temp == null || !temp.getPrefixAllBits().and(prefix).equals(temp.getPrefixAllBits())) {
+                return predicateMatch;
+            }
 
-        return 0;
+            // Update the best match predicate
+            predicateMatch = temp.getPredicate();
+
+            if (prefix.testBit(i)) {
+                temp = temp.right;
+            } else {
+                temp = temp.left;
+            }
+        }
+
+        return predicateMatch;
     }
 
     // Traverse the tree and return the list of paths to the curent node
     public ArrayList<TreeNode> getPath(BigInteger prefix) {
         ArrayList<TreeNode> path = new ArrayList<TreeNode>();
-        // Traverse the tree and return the list of paths to the curent node
+        prefix = prefix.shiftLeft(32 - prefix.bitLength());
 
+        TreeNode temp = this.root;
+
+        for (int i = 31; i >= 0; i--) {
+            if (temp == null) {
+                return path;
+            }
+            
+            path.add(temp);
+
+            if (prefix.testBit(i)) {
+                temp = temp.right;
+            } else {
+                temp = temp.left;
+            }
+        }
+
+        
         return path;
-    }
-
-    // Print the tree
-    public void printTree() {
     }
 
     // 0 is left, 1 is right
