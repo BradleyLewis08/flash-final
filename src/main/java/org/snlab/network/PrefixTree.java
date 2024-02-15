@@ -25,20 +25,37 @@ class TreeNode {
 
     // Returns the fill 32 bit representation of the prefix
     public BigInteger getPrefix() {
-        return this.prefix.shiftLeft(32 - this.prefix.bitLength());
+        return this.prefix;
+    }
+
+    public BigInteger getPrefixAllBits() {
+        return this.prefix.shiftRight(32 - this.prefix.bitLength());
     }
 
     public int getPredicate() {
         return this.predicate;
     }
+
+    public void setPredicate(int predicate) {
+        this.predicate = predicate;
+    }
 }
 
 public class PrefixTree {
+    private TreeNode root;
 
     // Constructor
+    public PrefixTree() {
+        this.root = new TreeNode(BigInteger.ZERO, 0);
+    }
 
-    // Add a node to the tree
-    public void addNode(BigInteger prefix, int predicate) {
+    // Update an existing node of the tree, or add a new one if it doesn't exist
+    public boolean updateNode(BigInteger prefix, int predicate) {
+        // Prefix is too long
+        if (prefix.bitLength() > 32) {
+            return false;
+        }
+        
         // Preprocess the prefix to be 32 bits
         prefix = prefix.shiftLeft(32 - prefix.bitLength());
 
@@ -46,14 +63,18 @@ public class PrefixTree {
         ArrayList<TreeNode> path = this.getPath(prefix);
         TreeNode parent = path.get(path.size() - 1);
 
-        if (parent.getPrefix().equals(prefix)) {
-            // If the prefix already exists, update the predicate
-            return;
+        // Node already exists, update instead
+        if (parent.getPrefixAllBits().equals(prefix)) {
+            parent.setPredicate(predicate);
+            return false;
         }
 
         // Set the node to the left or right of the parent based on the next bit
+        TreeNode child = new TreeNode(prefix, predicate);
 
-        // Set the child
+        this.insertNode(child, parent);
+
+        return true;
     }
 
     // Remove a node from the tree -- likely never used byt still useful
@@ -67,6 +88,7 @@ public class PrefixTree {
     public int getPredicate(BigInteger prefix) {
         // Traverse the tree and return the best match predicate
 
+
         return 0;
     }
 
@@ -76,6 +98,54 @@ public class PrefixTree {
         // Traverse the tree and return the list of paths to the curent node
 
         return path;
+    }
+
+    // Print the tree
+    public void printTree() {
+    }
+
+    // 0 is left, 1 is right
+    public void insertNode(TreeNode child, TreeNode parent) {
+        // Get the next bit of the parent prefix for the direction of the child insertion
+        boolean insertionDirection = child.getPrefix().testBit(parent.getPrefix().bitLength());
+        
+        // If right insertion
+        if (insertionDirection) {
+            // Check for children
+            if (parent.right == null) {
+                parent.right = child;
+                return;
+            }
+            
+            // Make the proper insertion
+            boolean childDirection = parent.right.getPrefix().testBit(child.getPrefix().bitLength());
+
+            if (childDirection) {
+                child.right = parent.right;
+                parent.right = child;
+            } else {
+                child.left = parent.right;
+                parent.right = child;
+            }
+        } else {
+            // Check for children
+            if (parent.left == null) {
+                parent.left = child;
+                return;
+            }
+
+            // Make the proper insertion
+            boolean childDirection = parent.left.getPrefix().testBit(child.getPrefix().bitLength());
+
+            if (childDirection) {
+                child.right = parent.left;
+                parent.left = child;
+            } else {
+                child.left = parent.left;
+                parent.left = child;
+            }
+
+        }
     }
 }
 
