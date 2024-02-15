@@ -178,7 +178,7 @@ public class PrefixTree {
     }
 
     // 0 is left, 1 is right
-    public void insertNode(TreeNode child, TreeNode parent) {
+    private void insertNode(TreeNode child, TreeNode parent) {
         // Get the next bit of the parent prefix for the direction of the child insertion
         boolean insertionDirection = child.getPrefix().testBit(parent.getPrefix().bitLength());
         
