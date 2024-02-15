@@ -2,21 +2,38 @@ package org.snlab.network;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+class PredicateReference {
+    private int predicate;
+
+    public PredicateReference(int predicate) {
+        this.predicate = predicate;
+    }
+
+    public int getPredicate() {
+        return this.predicate;
+    }
+
+    public void setPredicate(int predicate) {
+        this.predicate = predicate;
+    }
+}
 
 class TreeNode {
     private BigInteger prefix;
-    private int predicate;
+    private PredicateReference predicate;
     public TreeNode left;
     public TreeNode right;
 
-    public TreeNode(BigInteger prefix, int predicate) {
+    public TreeNode(BigInteger prefix, PredicateReference predicate) {
         this.prefix = prefix;
         this.predicate = predicate;
         this.left = null;
         this.right = null;
     }
 
-    public TreeNode(BigInteger prefix, int predicate, TreeNode left, TreeNode right) {
+    public TreeNode(BigInteger prefix, PredicateReference predicate, TreeNode left, TreeNode right) {
         this.prefix = prefix;
         this.predicate = predicate;
         this.left = left;
@@ -33,20 +50,29 @@ class TreeNode {
     }
 
     public int getPredicate() {
-        return this.predicate;
+        return this.predicate.getPredicate();
     }
 
     public void setPredicate(int predicate) {
-        this.predicate = predicate;
+        this.predicate.setPredicate(predicate);
     }
 }
 
 public class PrefixTree {
     private TreeNode root;
+    private HashMap<Integer, PredicateReference> predicatesToReferences;
 
     // Constructor
     public PrefixTree(int defaultPredicate) {
-        this.root = new TreeNode(BigInteger.ZERO, 0);
+        PredicateReference predicate = new PredicateReference(defaultPredicate);
+        this.root = new TreeNode(BigInteger.ZERO, predicate);
+    }
+
+    public void updatePredicateReference(int predicate, int newPredicate) {
+        PredicateReference reference = this.predicatesToReferences.get(predicate);
+        reference.setPredicate(newPredicate);
+        predicatesToReferences.remove(predicate);
+        predicatesToReferences.put(newPredicate, reference);
     }
 
     // Update an existing node of the tree, or add a new one if it doesn't exist
@@ -70,7 +96,16 @@ public class PrefixTree {
         }
 
         // Set the node to the left or right of the parent based on the next bit
-        TreeNode child = new TreeNode(prefix, predicate);
+        PredicateReference predicateReference;
+        // if predicate not in the map
+        if (!this.predicatesToReferences.containsKey(predicate)) {
+            predicateReference = new PredicateReference(predicate);
+            this.predicatesToReferences.put(predicate, predicateReference);
+        } else {
+            predicateReference = this.predicatesToReferences.get(predicate);
+        }
+
+        TreeNode child = new TreeNode(prefix, predicateReference);
 
         this.insertNode(child, parent);
 

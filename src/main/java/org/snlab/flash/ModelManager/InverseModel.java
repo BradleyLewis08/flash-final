@@ -331,6 +331,8 @@ public class InverseModel {
         }
     }
 
+
+
     public HashMap<Port, HashSet<Integer>> getPortToPredicate() {
         HashMap<Port, HashSet<Integer>> ret = new HashMap<>();
         for (Map.Entry<Ports, Integer> entry : portsToPredicate.entrySet())
