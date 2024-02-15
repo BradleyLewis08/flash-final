@@ -1,0 +1,17 @@
+{
+	root: node_id, 
+	nodes: {
+		"node_1": {
+			predicate: integer,
+			left: string,
+			right: string,
+			prefix: BigInteger
+		},
+		"node_2": {
+			predicate: integer,
+			left: string, 
+			right: string,
+			prefix: BigInteger
+		}
+	}
+}
