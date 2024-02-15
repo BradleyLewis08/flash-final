@@ -110,14 +110,14 @@ public final class BDDEngine {
         return bdd.ref(bdd.and(ret.result, tmp.result));
     }
 
-    public int getBestSrcIpMatch(BigInteger srcIp) {
+    public int convertDestToPredicate(BigInteger destIp) {
         TrieCode current = dst; // Start from the root of the source IP Trie
         TrieCode bestMatch = null; // To keep track of the best match
 
         // Iterate over each bit of the srcIp, starting from the highest order bit
         for (int i = size - 1; i >= 0; i--) {
             // Check if the current bit in srcIp is set (1) or not (0)
-            if (srcIp.testBit(i)) {
+            if (destIp.testBit(i)) {
                 // If the bit is set, move to the left child in the Trie
                 if (current.left != null) {
                     current = current.left;
@@ -141,22 +141,18 @@ public final class BDDEngine {
     }
 
     public boolean checkIntersection(int a, int b) {
-        // Negate the second predicate
-        int notPredicate2 = bdd.ref(bdd.not(b));
-
         // Calculate the intersection of the first predicate and the negation of the
         // second predicate
         int intersection = bdd.ref(bdd.and(a, b));
 
         // Check if the intersection is false
-        boolean isContained = intersection == BDDFalse;
+        boolean isContained = intersection == BDDTrue;
 
         // Don't forget to dereference BDD nodes when you're done with them to prevent
         // memory leaks
-        bdd.deref(notPredicate2);
         bdd.deref(intersection);
 
-        return !isContained;
+        return isContained;
     }
 
     public static int refCnt = 0, defCnt = 0;

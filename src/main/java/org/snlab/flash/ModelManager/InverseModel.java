@@ -281,7 +281,7 @@ public class InverseModel {
             // Get the destination IP, all sources, and a current predicate match
             BigInteger destIp = BigInteger.valueOf(destination);
             HashMap<Long, Port> sources = pairs.getSources(destination);
-            int predicateMatch = bddEngine.getBestSrcIpMatch(destIp);
+            int predicateMatch = bddEngine.convertDestToPredicate(destIp);
             Ports path = null;
 
             // Find the best union predicate match inside the EC
