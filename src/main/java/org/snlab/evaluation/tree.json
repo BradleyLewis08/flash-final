@@ -1,0 +1,15 @@
+{
+	root: node_id, 
+	nodes: {
+		"node_1": {
+			predicate: integer
+			left: "node_2",
+			right: "node_3"
+		},
+		"node_2": {
+			predicate: integer,
+			left: "node_2",
+			right: "node_3"
+		}
+	}
+}
